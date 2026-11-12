@@ -46,8 +46,13 @@ jobs:
       - uses: actions/checkout@v7
         with:
           ref: "refs/heads/pgo-build-tags"
-      - run: GH_TOKEN=${{ github.token }} gh release delete ${{ needs.tag.outputs.tag }} --cleanup-tag
-        continue-on-error: true
+      - name: Delete previous release for this build, if it exists
+        run: |
+          if GH_TOKEN=${{ github.token }} gh release view "${{ needs.tag.outputs.tag }}" >/dev/null 2>&1; then
+            GH_TOKEN=${{ github.token }} gh release delete "${{ needs.tag.outputs.tag }}" --cleanup-tag
+          else
+            echo "No existing release for ${{ needs.tag.outputs.tag }}, nothing to delete."
+          fi
       - name: Commit and push tag to pgo-build-tags branch
         run: |
           git config user.name "github-actions[bot]"
@@ -103,27 +108,21 @@ jobs:
           ffms2: "true"
           cmakeflags: "-DBUILD_TOOLS=OFF"
 
-      - id: detect-icelake-server-znver5
-        run: ls BuildAction/icelake-server+znver5/static/ffms2/SvtAv1EncApp.exe
-        continue-on-error: true
       - run: cd BuildAction/icelake-server+znver5/static/ffms2 && tar cJf Windows_x86-64_ffms2_icelake-server+znver5.tar.xz SvtAv1EncApp.exe
-        if: ${{ steps.detect-icelake-server-znver5.outcome != 'failure' }}
+        if: hashFiles('BuildAction/icelake-server+znver5/static/ffms2/SvtAv1EncApp.exe') != ''
       - uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ needs.tag.outputs.tag }}
           files: BuildAction/icelake-server+znver5/static/ffms2/Windows_x86-64_ffms2_icelake-server+znver5.tar.xz
-        if: ${{ steps.detect-icelake-server-znver5.outcome != 'failure' }}
+        if: hashFiles('BuildAction/icelake-server+znver5/static/ffms2/SvtAv1EncApp.exe') != ''
 
-      - id: detect-znver2
-        run: ls BuildAction/znver2/static/ffms2/SvtAv1EncApp.exe
-        continue-on-error: true
       - run: cd BuildAction/znver2/static/ffms2 && tar cJf Windows_x86-64_ffms2_znver2.tar.xz SvtAv1EncApp.exe
-        if: ${{ steps.detect-znver2.outcome != 'failure' }}
+        if: hashFiles('BuildAction/znver2/static/ffms2/SvtAv1EncApp.exe') != ''
       - uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ needs.tag.outputs.tag }}
           files: BuildAction/znver2/static/ffms2/Windows_x86-64_ffms2_znver2.tar.xz
-        if: ${{ steps.detect-znver2.outcome != 'failure' }}
+        if: hashFiles('BuildAction/znver2/static/ffms2/SvtAv1EncApp.exe') != ''
 
       - run: ls BuildAction/x86-64-v3+znver2/static/ffms2/SvtAv1EncApp.exe
       - run: cd BuildAction/x86-64-v3+znver2/static/ffms2 && tar cJf Windows_x86-64_ffms2_x86-64-v3+znver2.tar.xz SvtAv1EncApp.exe
@@ -178,27 +177,21 @@ jobs:
           ffms2: "true"
           cmakeflags: "-DBUILD_TOOLS=OFF"
 
-      - id: detect-icelake-server-znver5
-        run: ls BuildAction/icelake-server+znver5/static/base/SvtAv1EncApp
-        continue-on-error: true
       - run: cd BuildAction/icelake-server+znver5/static/base && tar cJf Linux_x86-64_icelake-server+znver5.tar.xz SvtAv1EncApp
-        if: ${{ steps.detect-icelake-server-znver5.outcome != 'failure' }}
+        if: hashFiles('BuildAction/icelake-server+znver5/static/base/SvtAv1EncApp') != ''
       - uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ needs.tag.outputs.tag }}
           files: BuildAction/icelake-server+znver5/static/base/Linux_x86-64_icelake-server+znver5.tar.xz
-        if: ${{ steps.detect-icelake-server-znver5.outcome != 'failure' }}
+        if: hashFiles('BuildAction/icelake-server+znver5/static/base/SvtAv1EncApp') != ''
 
-      - id: detect-znver2
-        run: ls BuildAction/znver2/static/base/SvtAv1EncApp
-        continue-on-error: true
       - run: cd BuildAction/znver2/static/base && tar cJf Linux_x86-64_znver2.tar.xz SvtAv1EncApp
-        if: ${{ steps.detect-znver2.outcome != 'failure' }}
+        if: hashFiles('BuildAction/znver2/static/base/SvtAv1EncApp') != ''
       - uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ needs.tag.outputs.tag }}
           files: BuildAction/znver2/static/base/Linux_x86-64_znver2.tar.xz
-        if: ${{ steps.detect-znver2.outcome != 'failure' }}
+        if: hashFiles('BuildAction/znver2/static/base/SvtAv1EncApp') != ''
 
       - run: ls BuildAction/x86-64-v3+znver2/static/base/SvtAv1EncApp
       - run: cd BuildAction/x86-64-v3+znver2/static/base && tar cJf Linux_x86-64_x86-64-v3+znver2.tar.xz SvtAv1EncApp
@@ -208,24 +201,24 @@ jobs:
           files: BuildAction/x86-64-v3+znver2/static/base/Linux_x86-64_x86-64-v3+znver2.tar.xz
 
       - run: ls BuildAction/icelake-server+znver5/static/ffms2/SvtAv1EncApp
-        if: ${{ steps.detect-icelake-server-znver5.outcome != 'failure' }}
+        if: hashFiles('BuildAction/icelake-server+znver5/static/ffms2/SvtAv1EncApp') != ''
       - run: cd BuildAction/icelake-server+znver5/static/ffms2 && tar cJf Linux_x86-64_ffms2_icelake-server+znver5.tar.xz SvtAv1EncApp
-        if: ${{ steps.detect-icelake-server-znver5.outcome != 'failure' }}
+        if: hashFiles('BuildAction/icelake-server+znver5/static/ffms2/SvtAv1EncApp') != ''
       - uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ needs.tag.outputs.tag }}
           files: BuildAction/icelake-server+znver5/static/ffms2/Linux_x86-64_ffms2_icelake-server+znver5.tar.xz
-        if: ${{ steps.detect-icelake-server-znver5.outcome != 'failure' }}
+        if: hashFiles('BuildAction/icelake-server+znver5/static/ffms2/SvtAv1EncApp') != ''
 
       - run: ls BuildAction/znver2/static/ffms2/SvtAv1EncApp
-        if: ${{ steps.detect-znver2.outcome != 'failure' }}
+        if: hashFiles('BuildAction/znver2/static/ffms2/SvtAv1EncApp') != ''
       - run: cd BuildAction/znver2/static/ffms2 && tar cJf Linux_x86-64_ffms2_znver2.tar.xz SvtAv1EncApp
-        if: ${{ steps.detect-znver2.outcome != 'failure' }}
+        if: hashFiles('BuildAction/znver2/static/ffms2/SvtAv1EncApp') != ''
       - uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ needs.tag.outputs.tag }}
           files: BuildAction/znver2/static/ffms2/Linux_x86-64_ffms2_znver2.tar.xz
-        if: ${{ steps.detect-znver2.outcome != 'failure' }}
+        if: hashFiles('BuildAction/znver2/static/ffms2/SvtAv1EncApp') != ''
 
       - run: ls BuildAction/x86-64-v3+znver2/static/ffms2/SvtAv1EncApp
       - run: cd BuildAction/x86-64-v3+znver2/static/ffms2 && tar cJf Linux_x86-64_ffms2_x86-64-v3+znver2.tar.xz SvtAv1EncApp
