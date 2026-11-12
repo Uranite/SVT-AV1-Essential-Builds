@@ -1,0 +1,7 @@
+# Build-only repository; no compiled artifacts are tracked here.
+BuildAction/
+PGO/
+deps/
+install/
+svt_build/
+Bin/
