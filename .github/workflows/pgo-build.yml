@@ -81,7 +81,7 @@ jobs:
 
             On x86-64 systems, no matter if you're on an Intel or AMD system, you should try these builds in the order of `icelake-server` + `znver5` ⇒ `znver2` ⇒ `x86-64-v3` + `znver2`.  
             If your CPU doesn't support the features required by the `icelake-server` + `znver5` version, often indicated by crashing outright when attempting to make any encodes, you can try the `znver2` version and see if that works. If not, then the `x86-64-v3` + `znver2` version, which should always work on any modern systems.  
-            Some versions might not be available if the GitHub Actions runners we get this time don't support the respective features.  
+            Not every variant listed above is guaranteed to be present in a given release. Which builds are published depends on the GitHub Actions runner the workflow is assigned to: if that runner's CPU doesn't support a variant's required features, that variant is skipped and no file is uploaded. For example, a runner without `icelake-server` support produces no `icelake-server` build for that run. Check the release assets for what is actually available.  
 
             Thanks to studies and contributions from afed, Emre, Ironclad, Itachi Uchiha, Khaoklong, Miss Ashenlight, Soda, SwareJonge, Trix, Yiss, and other people in the community for discovering the method to build the fastest binary.  
           prerelease: false

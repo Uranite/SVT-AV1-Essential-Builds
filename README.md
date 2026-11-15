@@ -19,10 +19,19 @@ the encoder commit it was built from. Builds are LTO + PGO:
 Pick the variant that matches your CPU. If you are unsure, use `x86-64-v3` on
 x86-64.
 
+Availability varies per release. Not every variant in the table is guaranteed to
+be present, because builds are produced by whatever GitHub Actions runner the
+workflow is assigned to, and a variant is only built when that runner's CPU
+supports its required features. If the runner doesn't have a given feature set,
+that variant is skipped and no file is uploaded for it. For example, a runner
+without `icelake-server` support means there is no `icelake-server` build for
+that run. Always check the release assets to see what is actually available.
+
 ## License
 
-The encoder is BSD 2-Clause plus the AOMedia Patent License 1.0, as stated in
-its [LICENSE.md](https://github.com/nekotrix/SVT-AV1-Essential/blob/Essential-v4.3.0/LICENSE.md).
+The encoder is BSD 2-Clause plus the AOMedia Patent License 1.0. See
+[LICENSE.md](https://github.com/nekotrix/SVT-AV1-Essential/blob/Essential-v4.3.0/LICENSE.md)
+for more details.
 These binaries are distributed unmodified.
 
 ## Credits
