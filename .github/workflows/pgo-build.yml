@@ -10,7 +10,7 @@ on:
       encoder_ref:
         description: "Branch, tag, or commit of the encoder to build"
         required: true
-        default: "Essential-v4.3.0"
+        default: "Essential-v4.3.1"
         type: string
 
 permissions:

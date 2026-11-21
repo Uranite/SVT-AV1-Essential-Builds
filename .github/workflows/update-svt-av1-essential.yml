@@ -1,0 +1,54 @@
+name: Update SVT-AV1-Essential
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Upstream branch, tag, or commit (default: latest Essential-v* branch)'
+        required: false
+        default: ''
+        type: string
+
+concurrency:
+  group: update-svt-av1-essential
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  update:
+    name: Update pin to latest upstream commit
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Update SVT-AV1-Essential
+        id: update
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          UPSTREAM_REF: ${{ inputs.ref }}
+        run: bash scripts/update-svt-av1-essential.sh
+
+      - name: Commit and push
+        if: steps.update.outputs.pin_changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add upstream-pin.json
+          git commit -m "Update SVT-AV1-Essential to ${{ steps.update.outputs.version }}"
+          git push
+
+      # Pushes made with GITHUB_TOKEN do not start workflow runs, so start the
+      # PGO build explicitly after a new upstream commit is pinned.
+      - name: Trigger PGO build
+        if: steps.update.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh workflow run pgo-build.yml --ref main \
+            -f encoder_repo="${{ steps.update.outputs.repo }}" \
+            -f encoder_ref="${{ steps.update.outputs.commit }}"

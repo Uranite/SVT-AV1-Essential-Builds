@@ -27,6 +27,14 @@ that variant is skipped and no file is uploaded for it. For example, a runner
 without `icelake-server` support means there is no `icelake-server` build for
 that run. Always check the release assets to see what is actually available.
 
+## Automated updates
+
+The `Update SVT-AV1-Essential` workflow runs daily (and on manual dispatch). It
+follows the latest `Essential-v*` branch of the upstream repository, records the
+newest commit in `upstream-pin.json`, and automatically starts a `pgo-build`
+run whenever upstream has a new commit. A specific branch, tag, or commit can
+be forced via the workflow's `ref` input.
+
 ## License
 
 The encoder is BSD 2-Clause plus the AOMedia Patent License 1.0. See
