@@ -101,6 +101,17 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
 
+      # Temporary workaround, remove once fixed upstream: Clang targeting
+      # Windows/MSVC does not define __GNUC__, so rd_cost.c drops the AVX-512
+      # target attribute and fails to compile for the znver2 and x86-64-v3
+      # variants. Use bash rather than the job's msys2 shell, which is not
+      # available until the build action runs.
+      - name: Patch rd_cost.c AVX-512 target guard
+        shell: bash
+        run: |
+          sed -i 's/^#if defined(__GNUC__)[[:space:]]*$/#if defined(__GNUC__) || defined(__clang__)/' Source/Lib/Codec/rd_cost.c
+          grep -q '#if defined(__GNUC__) || defined(__clang__)' Source/Lib/Codec/rd_cost.c
+
       - uses: Akatmks/build-svt-av1@v2
         with:
           pgo-video: "FoodMarket2"
